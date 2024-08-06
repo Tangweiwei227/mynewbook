@@ -1,14 +1,27 @@
 # Book settings
 # Learn more at https://jupyterbook.org/customize/config.html
 
-title: My sample book
+title: 数据分析实践小册
 author: Tevin
 logo: logo.png
+email: 312011010630@home.hpu.edu.cn
+
+# exclude:
+#   - startup/
+
+# #   - myfolder1/
+# #   - myfolder2/
+# #   - myfolder3/
+#   # - "*.txt"  # 忽略所有扩展名为.txt的文件
+#   # - "*.tmp" 
+only_build_toc_files: true
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
 execute:
-  execute_notebooks: force
+  # execute_notebooks: force
+  execute_notebooks: 'off' # 所有的notebook都会直接把跑好的输出generate出来而不会重新运行ipynb！
+
 
 # Define the name of the latex output file for PDF builds
 latex:
@@ -22,7 +35,7 @@ bibtex_bibfiles:
 # Information about where the book exists on the web
 repository:
   url: https://github.com/executablebooks/jupyter-book  # Online location of your book
-  path_to_book: docs  # Optional path to your book, relative to the repository root
+  # path_to_book: docs  # Optional path to your book, relative to the repository root
   branch: master  # Which branch of the repository should be used when creating links (optional)
 
 # Add GitHub buttons to your book
@@ -30,3 +43,13 @@ repository:
 html:
   use_issues_button: true
   use_repository_button: true
+  # use_edit_page_button: true
+  # comments:
+  #   hypothesis: true
+
+
+# sphinx:
+#   extra_extensions:
+#     - sphinx_proof
+#   config:
+#     language: en # Change language to English. 没有这一行会是强行翻译的中文

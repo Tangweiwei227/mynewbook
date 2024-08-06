@@ -1,11 +1,7 @@
-# Welcome to your Jupyter Book
+# 数据分析实践小册子
 
-This is a small sample book to give you a feel for how book content is
-structured.
-It shows off a few of the major file types, as well as some sample content.
-It does not go in-depth into any particular topic - check out [the Jupyter Book documentation](https://jupyterbook.org) for more information.
+这是一本数据分析实践的小册子。记录感兴趣的数据分析实践方法，以及一些数据分析的实践案例。努力跟上大佬的脚步，不断学习，不断进步。
 
-Check out the content pages bundled with this sample book to see more.
 
 ```{tableofcontents}
 ```

@@ -3,8 +3,61 @@
 
 format: jb-book
 root: intro
-chapters:
-- file: markdown
-- file: notebooks
-- file: markdown-notebooks
-- file: mymarkdownfile
+parts:
+  - caption: 电商数据分析
+    chapters:
+      - file: 电商数据分析/first.ipynb
+      - file: 电商数据分析/second.ipynb
+
+
+# format: jb-book
+# root: intro
+# parts:
+#   - caption: 数据ETL流程
+#     chapters:
+#       - file: Data_ETL/README.md
+#       - file: Data_ETL/Data_cleaning/README.md
+#         sections:
+#         - file: Data_ETL/Data_cleaning/Regex.ipynb
+#         - file: Data_ETL/Data_cleaning/pandas.ipynb
+#   - caption: 统计分析
+#     chapters:
+#       - file: STAT/README.md
+#   - caption: 因果推断
+#     chapters:
+#       - file: Causal_Inference/README.md
+#       - file: Causal_Inference/1_AB_testing.md
+#       - file: Causal_Inference/2_methods.md
+#   - caption: 机器学习
+#     chapters:
+#       - url: https://ab5q6faprt.feishu.cn/wiki/wikcnAAmnFwoirO0g9YD546QD0P
+#         title: 飞书笔记
+#   - caption: 数据可视化
+#     chapters:
+#       - url: https://ab5q6faprt.feishu.cn/wiki/wikcndQAXpgjyCzgZxGwc0JDp2f
+#         title: 飞书笔记
+#   - caption: 深度学习
+#     chapters:
+#       - file: DL/Basics/README.md
+#         sections:
+#         - file: DL/Basics/DL_hyperparameter
+#         - file: DL/Basics/Optimizer
+#         - file: DL/Basics/Trained_by_GPU
+#       - file: DL/NLP/README
+#         sections:
+#         - file: DL/NLP/basics
+#         - file: DL/NLP/Self-attention
+#         - file: DL/NLP/Transformer
+#         - file: DL/NLP/BERT
+#       - file: DL/NN_compression/README
+#         sections:
+#         - file: DL/NN_compression/KD.ipynb
+#           sections:
+#           - file: DL/NN_compression/Distill_Bert.md
+#         - file: DL/NN_compression/Quantize.md
+#           sections:
+#           - file: DL/NN_compression/QBert.md
+#   - caption: 联系方式
+#     chapters:
+#       - url: https://www.linkedin.com/in/jinhang-yang/
+#         title: LinkedIn
