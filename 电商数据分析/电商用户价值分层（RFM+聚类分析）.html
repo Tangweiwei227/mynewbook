@@ -1,0 +1,1417 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>用户价值分层探索（RFM+K-Means） &#8212; 数据分析实践小册</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '电商数据分析/电商用户价值分层（RFM+聚类分析）';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="用户行为分析" href="second.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="数据分析实践小册 - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="数据分析实践小册 - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    数据分析实践小册子
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">电商数据分析</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="first.html">商品分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="second.html">用户行为分析</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">用户价值分层探索（RFM+K-Means）</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/电商数据分析/电商用户价值分层（RFM+聚类分析）.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>用户价值分层探索（RFM+K-Means）</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">项目背景与目的</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">项目背景</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">项目目的</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">数据读取及预处理</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">描述性统计</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">用户价值分类</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">1. 用中位数进行用户价值分类</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">中位数分群的思考</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">2.用分组价值打分及平均值进行用户分群</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">平均值分组打分方法的思考</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">3. 用聚类方法进行用户分群</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">1) 标准化处理</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">2) 测试获取最优的聚类簇数</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">3) 确定模型</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">4) 聚类结论</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">4. 结论与思考</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">用户价值分类结论：</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">分群方法选择的思考：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="rfm-k-means">
+<h1>用户价值分层探索（RFM+K-Means）<a class="headerlink" href="#rfm-k-means" title="Link to this heading">#</a></h1>
+<section id="id1">
+<h2>项目背景与目的<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<section id="id2">
+<h3>项目背景<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>企业发展到一定的规模之后，需要对用户的特性进行精准营销，提高营销效率。
+RFM模型是基于用户行为数据的分析方法，用于评估客户的价值和转化难易程度。将用户在最近一次购买时间 、消费频次、消费金额积累三个维度进行用户分群，通过分析用户的三个指标，根据不同群体的情况作不同的运营策略。</p>
+<ol class="arabic simple">
+<li><p><strong>R (Recency)</strong> - 最近一次消费时间：衡量用户最后一次购买或消费的时间距离现在有多久。R值越小，表示用户最近有消费行为，其价值通常被认为越高，因为它们更有可能进行再次购买。</p></li>
+<li><p><strong>F (Frequency)</strong> - 消费频次：衡量用户在特定时间段内购买或消费的频率。F值越高，表示用户的消费频次越频繁，这通常意味着用户对产品的忠诚度更高，对企业的价值也更大。</p></li>
+<li><p><strong>M (Monetary)</strong> - 消费金额：衡量用户在特定时间段内的总消费金额。M值越高，表示用户的累计消费金额越大，这通常反映了用户的购买力和对产品的贡献度。</p></li>
+</ol>
+<p>通过对这三个指标的分析，可以将用户分为不同的群体，并针对不同群体制定相应的运营策略。例如：</p>
+<ul class="simple">
+<li><p>对于R值较小、F和M值较高的用户群体，可能会提供忠诚度奖励或VIP服务，以维持其高价值客户。</p></li>
+<li><p>对于R值较大、但是F和M值较高的用户群体，可能会采取促销活动或个性化推荐，以重新吸引他们的注意力。</p></li>
+<li><p>对于R值较小、F值较高但M值较低的用户群体，可能会提供小额优惠或捆绑销售，以提高他们的消费金额。</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>项目目的<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>关于用户如何在这三个维度上分群，有很多不同的方法，探讨以下三种方式在分群上的优劣性，并且尝试进行说明在什么情况下使用什么方法较好：</p>
+<ul class="simple">
+<li><p>用中位数分群</p></li>
+<li><p>用分组价值打分及平均值进行用户分群</p></li>
+<li><p>用聚类方法进行分群</p></li>
+</ul>
+</li>
+<li><p>进行用户分群，对不同的分群作出解释及运营建议</p></li>
+</ol>
+</section>
+</section>
+<section id="id4">
+<h2>数据读取及预处理<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># %matplotlib ipympl</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">warnings</span> 
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/tangwei/opt/anaconda3/lib/python3.9/site-packages/pandas/core/computation/expressions.py:21: UserWarning: Pandas requires version &#39;2.8.4&#39; or newer of &#39;numexpr&#39; (version &#39;2.8.3&#39; currently installed).
+  from pandas.core.computation.check import NUMEXPR_INSTALLED
+/Users/tangwei/opt/anaconda3/lib/python3.9/site-packages/pandas/core/arrays/masked.py:60: UserWarning: Pandas requires version &#39;1.3.6&#39; or newer of &#39;bottleneck&#39; (version &#39;1.3.5&#39; currently installed).
+  from pandas.core import (
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;/Users/tangwei/Downloads/📈Work/Data-analysis-doing/电商数据客户价值分析探索/data.xlsx&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;买家实际支付金额&#39;</span><span class="p">:</span> <span class="s1">&#39;M&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>买家会员名</th>
+      <th>R</th>
+      <th>M</th>
+      <th>F</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>00牛哥哥00</td>
+      <td>692.591435</td>
+      <td>402.00</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>020luo</td>
+      <td>407.855521</td>
+      <td>74.70</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0587xueguangju</td>
+      <td>625.368148</td>
+      <td>268.00</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0o秋天de童话</td>
+      <td>82.045532</td>
+      <td>411.50</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0残缺0</td>
+      <td>345.463183</td>
+      <td>48.86</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>买家会员名    0
+R        0
+M        0
+F        0
+dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 确认一下买家会员号名是否唯一</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;买家会员名&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2>描述性统计<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;whitegrid&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="s1">&#39;F&#39;</span><span class="p">]</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">colnames</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">colnames</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>  
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/75c7889113adf7de0f1363468d5b86d8dc9390d97cd734c74362d78b71f4100c.png" src="../_images/75c7889113adf7de0f1363468d5b86d8dc9390d97cd734c74362d78b71f4100c.png" />
+</div>
+</div>
+<p>如上面三幅图所示，只有R的值分布相对均匀，F M的值都是右偏偏态分布；</p>
+</section>
+<section id="id6">
+<h2>用户价值分类<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<section id="id7">
+<h3>1. 用中位数进行用户价值分类<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 计算R F M的中位数</span>
+<span class="n">median_list</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="s1">&#39;F&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># 将每个客户进行标记</span>
+<span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;R值判断高低&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;R&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="s1">&#39;0&#39;</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">median_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;M值判断高低&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="s1">&#39;0&#39;</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">median_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;F值判断高低&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;F&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="s1">&#39;0&#39;</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">median_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+
+
+<span class="n">dict_type</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;000&#39;</span><span class="p">:</span><span class="s1">&#39;一般挽留用户&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;100&#39;</span><span class="p">:</span><span class="s1">&#39;一般发展用户&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;001&#39;</span><span class="p">:</span><span class="s1">&#39;一般保持用户&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;101&#39;</span><span class="p">:</span><span class="s1">&#39;一般价值用户&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;010&#39;</span><span class="p">:</span><span class="s1">&#39;重要挽留用户&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;011&#39;</span><span class="p">:</span><span class="s1">&#39;重要保持用户&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;110&#39;</span><span class="p">:</span><span class="s1">&#39;重要发展用户&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;111&#39;</span><span class="p">:</span><span class="s1">&#39;重要价值用户&#39;</span>
+<span class="p">}</span>
+<span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;R值判断高低&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;M值判断高低&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;F值判断高低&#39;</span><span class="p">]</span>
+<span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;用户价值分类&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dict_type</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>买家会员名</th>
+      <th>R</th>
+      <th>M</th>
+      <th>F</th>
+      <th>R值判断高低</th>
+      <th>M值判断高低</th>
+      <th>F值判断高低</th>
+      <th>tag</th>
+      <th>用户价值分类</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>00牛哥哥00</td>
+      <td>692.591435</td>
+      <td>402.00</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>011</td>
+      <td>重要保持用户</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>020luo</td>
+      <td>407.855521</td>
+      <td>74.70</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>000</td>
+      <td>一般挽留用户</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0587xueguangju</td>
+      <td>625.368148</td>
+      <td>268.00</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>010</td>
+      <td>重要挽留用户</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0o秋天de童话</td>
+      <td>82.045532</td>
+      <td>411.50</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>111</td>
+      <td>重要价值用户</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0残缺0</td>
+      <td>345.463183</td>
+      <td>48.86</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>000</td>
+      <td>一般挽留用户</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.family&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Heiti TC&#39;</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_median</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;用户价值分类&#39;</span><span class="p">)[</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">result_median</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">result_median</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">result_median</span><span class="p">)):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">result_median</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">i</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">value</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">s</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">value</span><span class="p">),</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;用户数&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/9d16957c33471b16ad3152dca0733834c32f805590e0cc0df188d8f97763d758.png" src="../_images/9d16957c33471b16ad3152dca0733834c32f805590e0cc0df188d8f97763d758.png" />
+</div>
+</div>
+<p>从上图来说，重要用户中，
+重要挽留用户较多，有306位，他们是购买金额较高但是购买频次不高，最近也没有下单的用户，建议:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>个性化推荐和优惠：根据用户的历史购买记录和浏览习惯，推送个性化的产品推荐。提供专属优惠券或折扣，以激励他们重新下单。例如，限时折扣、买一送一或满减优惠。</p></li>
+<li><p>会员或忠诚度计划：吸引他们加入或升级现有的会员计划，提供积分返利或专属福利，让他们感受到作为高价值客户的特别待遇。</p></li>
+<li><p>唤醒邮件或短信：发送唤醒邮件或短信，提醒他们有新的优惠或产品。可以结合限时优惠，制造紧迫感。在邮件或短信中突出他们之前的购买行为，提醒他们他们是重要客户。</p></li>
+<li><p>增加互动：通过问卷调查或反馈表了解他们为什么最近没有购买，获取他们的意见和建议。举办有趣的线上活动，如抽奖、游戏或问答，增加品牌互动和用户粘性。</p></li>
+</ol>
+</div></blockquote>
+<p>重要保持用户：即支付金额较高，购买频次较高的用户 但是最近没有下单的用户，建议:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>会员或忠诚度计划：吸引他们加入或升级现有的会员计划，提供积分返利或专属福利，让他们感受到作为高价值客户的特别待遇。</p></li>
+<li><p>唤醒邮件或短信：发送唤醒邮件或短信，提醒他们有新的优惠或产品。可以结合限时优惠，制造紧迫感。在邮件或短信中突出他们之前的购买行为，提醒他们他们是重要客户。</p></li>
+<li><p>增加互动：通过问卷调查或反馈表了解他们为什么最近没有购买，获取他们的意见和建议。举办有趣的线上活动，如抽奖、游戏或问答，增加品牌互动和用户粘性。</p></li>
+<li><p>限量或独家产品：推出限量版或独家产品，吸引他们重新关注品牌。高价值客户通常对特别和独家的产品更感兴趣。</p></li>
+</ol>
+</div></blockquote>
+<p>重要发展用户：即支付金额较高、最近有下单但是购买频次不高的用户，需要提高消费频次，建议：</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>促销活动：推出促销活动，如满减、买赠、限时折扣等，激励用户增加购买频次。可以结合用户的历史购买记录，针对性地推送相关产品或优惠。</p></li>
+<li><p>个性化推荐：根据用户的购买历史和浏览行为，推送个性化的产品推荐。提供专属优惠券或折扣，吸引他们再次下单。</p></li>
+<li><p>会员或忠诚度计划：吸引他们加入或升级会员计划，提供积分返利或专属福利。例如，购买满一定金额即可获得积分或礼品，激励用户增加购买频次。</p></li>
+<li><p>限时促销：推出限时促销活动，制造紧迫感。例如，限时折扣、买一送一或满减优惠，吸引用户尽快下单。</p></li>
+<li><p>互动活动：举办有趣的线上活动，如抽奖、游戏或问答，增加用户互动和粘性。可以结合促销活动，提高用户参与度。</p></li>
+<li><p>社交分享：鼓励用户分享购买体验或产品评价，提高品牌曝光度和用户参与度。可以提供积分或礼品作为奖励，激励用户分享。</p></li>
+<li><p>个性化服务：提供个性化的售后服务，如定制产品、专属客服或快速退换货服务。提高用户满意度和忠诚度，增加复购率。</p></li>
+<li><p>会员专属活动：举办会员专属活动，如新品预售、专属礼包或线下活动。提高用户参与度和忠诚度，增加用户粘性。</p></li>
+<li><p>产品体验：提供产品试用或体验活动，让用户更直观地了解产品特点和优势。可以提供免费样品或试用装，激励用户尝试购买。</p></li>
+</ol>
+</div></blockquote>
+<section id="id8">
+<h4>中位数分群的思考<a class="headerlink" href="#id8" title="Link to this heading">#</a></h4>
+<p><strong>中位数划分存在的问题：</strong> 在用户价值分类当中，用中位数划分用户群体，可能会存在划分的群体在价值方面没有明显的区分，比如说买家实际支付金额（M）的中位数为104.65，但是在104.65附近还有很多数值，比104.65高的和比104.65低的用户可能相差不远，这样得到的价值高和价值低的部分用户其实区别不大；</p>
+<hr class="docutils" />
+<p>在实际操作中，可以用以下的方法区分：</p>
+<ul class="simple">
+<li><p><strong>方法一：</strong> 将贡献80%营业额的用户划分为M价值比较高的用户，将贡献80%单量的用户划分为F价值较高的用户；</p></li>
+<li><p><strong>方法二：</strong> 使用一些行业的数据，在R的价值划分上，比如说，</p>
+<ul>
+<li><p>一个用户大概多久可以熟悉产品的使用</p></li>
+<li><p>购买的品类是消耗品（需要经常购买）还是使用时间较长的品类，平均<strong>多久会产生复购</strong>
+对于这些信息，可以作为R划分的节点</p></li>
+</ul>
+</li>
+<li><p><strong>方法三：</strong> 使用聚类对RFM进行划分，在进行打分，这样可以利用用户群的数据离散及集中程度，从某种程度上减少对于价值高的用户与价值低的用户在数值上相差不远的问题</p></li>
+</ul>
+</section>
+</section>
+<section id="id9">
+<h3>2.用分组价值打分及平均值进行用户分群<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 重新保存一个数据集，以免产生混乱</span>
+<span class="n">data_mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">data_mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;买家会员名&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="s1">&#39;F&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 数据分箱</span>
+<span class="c1"># 采取均匀的数据分箱方法</span>
+<span class="n">R_score</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;R&#39;</span><span class="p">],</span><span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">retbins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">F_score</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;F&#39;</span><span class="p">],</span><span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span><span class="n">retbins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">M_score</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;M&#39;</span><span class="p">],</span><span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span><span class="n">retbins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;R-score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">R_score</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;F-score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">F_score</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;M-score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">M_score</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;R的分组临界值：&#39;</span><span class="p">,</span><span class="n">R_score</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;F的分组临界值：&#39;</span><span class="p">,</span><span class="n">F_score</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;M的分组临界值：&#39;</span><span class="p">,</span><span class="n">M_score</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R的分组临界值： [ -1.15022194 145.06605556 290.55488889 436.04372222 581.53255556
+ 727.02138889]
+F的分组临界值： [0.994 2.2   3.4   4.6   5.8   7.   ]
+M的分组临界值： [-8.241800e+00  2.653360e+03  5.301720e+03  7.950080e+03  1.059844e+04
+  1.324680e+04]
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>买家会员名</th>
+      <th>R</th>
+      <th>M</th>
+      <th>F</th>
+      <th>R-score</th>
+      <th>F-score</th>
+      <th>M-score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>00牛哥哥00</td>
+      <td>692.591435</td>
+      <td>402.00</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>020luo</td>
+      <td>407.855521</td>
+      <td>74.70</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0587xueguangju</td>
+      <td>625.368148</td>
+      <td>268.00</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0o秋天de童话</td>
+      <td>82.045532</td>
+      <td>411.50</td>
+      <td>2</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0残缺0</td>
+      <td>345.463183</td>
+      <td>48.86</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 计算平均值</span>
+<span class="n">mean_list</span> <span class="o">=</span> <span class="n">data_mean</span><span class="p">[[</span><span class="s1">&#39;R-score&#39;</span><span class="p">,</span><span class="s1">&#39;M-score&#39;</span><span class="p">,</span><span class="s1">&#39;F-score&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mean_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-score    3.293711
+M-score    1.005660
+F-score    1.076730
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 分别划分R\F\M</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;R值判断高低&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;R-score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span> <span class="k">if</span> <span class="n">x</span><span class="o">&lt;=</span><span class="n">mean_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;M值判断高低&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;M-score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span> <span class="k">if</span> <span class="n">x</span><span class="o">&lt;=</span><span class="n">mean_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;F值判断高低&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;F-score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span> <span class="k">if</span> <span class="n">x</span><span class="o">&lt;=</span><span class="n">mean_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="c1"># 标记RFM</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;R值判断高低&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;M值判断高低&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;F值判断高低&#39;</span><span class="p">]</span>
+<span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;用户价值分类&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_mean</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dict_type</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 分组结果展示</span>
+<span class="n">result_mean</span> <span class="o">=</span> <span class="n">data_mean</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;用户价值分类&#39;</span><span class="p">)[</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">result_mean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">result_mean</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">result_mean</span><span class="p">)):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">result_mean</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">i</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">value</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">s</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">value</span><span class="p">),</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;用户数&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/fd2eb348d1306a4e36c6edc9bc0d08ffd437380908b62ccf945422fbe625f653.png" src="../_images/fd2eb348d1306a4e36c6edc9bc0d08ffd437380908b62ccf945422fbe625f653.png" />
+</div>
+</div>
+<section id="id10">
+<h4>平均值分组打分方法的思考<a class="headerlink" href="#id10" title="Link to this heading">#</a></h4>
+<p>在这个方法中，使用均匀分箱的方式进行打分，最终进行划分的结果，不会在F、M数值相差不远的用户划分为两类，在划分群组上更加合理</p>
+<p>优化方向：使用行业数据结合业务经验调整分组方法。本质上类似于阈值分析，区分什么是好的，什么是不好的。</p>
+</section>
+</section>
+<section id="id11">
+<h3>3. 用聚类方法进行用户分群<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id12">
+<h4>1) 标准化处理<a class="headerlink" href="#id12" title="Link to this heading">#</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="s1">&#39;F&#39;</span><span class="p">]]</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="n">col</span><span class="p">]])</span> <span class="c1"># 标准化后输出numpy.ndarray，所以循环处理</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>R</th>
+      <th>M</th>
+      <th>F</th>
+      <th>category</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>1.590000e+03</td>
+      <td>1.590000e+03</td>
+      <td>1.590000e+03</td>
+      <td>1590.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>-9.384527e-17</td>
+      <td>-2.876804e-17</td>
+      <td>-7.485277e-17</td>
+      <td>1.070440</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>1.000315e+00</td>
+      <td>1.000315e+00</td>
+      <td>1.000315e+00</td>
+      <td>0.641599</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>-1.632072e+00</td>
+      <td>-4.014056e-01</td>
+      <td>-4.139585e-01</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>-7.588200e-01</td>
+      <td>-3.112307e-01</td>
+      <td>-4.139585e-01</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>9.790299e-02</td>
+      <td>-2.136218e-01</td>
+      <td>-4.139585e-01</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>6.630941e-01</td>
+      <td>9.420029e-02</td>
+      <td>-4.139585e-01</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>2.181441e+00</td>
+      <td>2.455188e+01</td>
+      <td>8.623030e+00</td>
+      <td>3.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="id13">
+<h4>2) 测试获取最优的聚类簇数<a class="headerlink" href="#id13" title="Link to this heading">#</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sse</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">scope</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">scope</span><span class="p">:</span>
+    <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">sse</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kmeans</span><span class="o">.</span><span class="n">inertia_</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">sse</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Number of clusters&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;SSE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Elbow Method for Optimal k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/e3ed2c7485538c4d492064226c053527490ef346fcc6140261f48e9f5bc120c2.png" src="../_images/e3ed2c7485538c4d492064226c053527490ef346fcc6140261f48e9f5bc120c2.png" />
+</div>
+</div>
+<p>根据肘部法则，在k=4时产生明显的转折，应该取k=4</p>
+</section>
+<section id="id14">
+<h4>3) 确定模型<a class="headerlink" href="#id14" title="Link to this heading">#</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># random.seed(123)</span>
+<span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">X</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">labels_</span>
+<span class="n">label_mean</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;category&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="s1">&#39;F&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">X</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>category
+1    930
+2    385
+0    273
+3      2
+Name: count, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">label_mean</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>R</th>
+      <th>M</th>
+      <th>F</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-0.477680</td>
+      <td>0.230680</td>
+      <td>1.743223</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.634791</td>
+      <td>-0.054210</td>
+      <td>-0.349177</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-1.188546</td>
+      <td>-0.157779</td>
+      <td>-0.413958</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-1.179410</td>
+      <td>24.092454</td>
+      <td>4.104536</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>为了给每一类赋予实际意义，画出他们在RFM各个值的箱线图</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建一个包含三个子图的图像</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Boxplot of R by Category&#39;</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Boxplot of M by Category&#39;</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Boxplot of F by Category&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/dee5a0e3757a490fd072bb33a54b2dfb138822ad1da8a06bd26396cf4e7b6200.png" src="../_images/dee5a0e3757a490fd072bb33a54b2dfb138822ad1da8a06bd26396cf4e7b6200.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>从R的各类分布图可以看出，1类用户的最近一次购买时间距今最远。</p></li>
+<li><p>从买家实际支付金额来说，3类用户具有较高的支付金额；</p></li>
+<li><p>从购买频次来说，标签为0、3的用户具有最高的购买频次，1、2都是低购买频次</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">label_count</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">label_count</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">label_count</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label_count</span><span class="p">)):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">label_count</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">label_count</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">s</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">label_count</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/35f01d4f4df2717d7533fefe725b4cbce7f56f9c60b7fd2b551f1a6d250509be.png" src="../_images/35f01d4f4df2717d7533fefe725b4cbce7f56f9c60b7fd2b551f1a6d250509be.png" />
+</div>
+</div>
+</section>
+<section id="id15">
+<h4>4) 聚类结论<a class="headerlink" href="#id15" title="Link to this heading">#</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a 3D scatter plot</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot the data points with different colors based on the cluster labels</span>
+<span class="c1"># 标记不同的类别</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+<span class="c1"># ax.scatter(X[&#39;R&#39;], X[&#39;F&#39;], X[&#39;M&#39;], c=labels, cmap=&#39;viridis&#39;)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="c1"># Set labels for the axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+
+<span class="c1"># Show the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/fc8f08a01c2e5240f7e520e09fb9fe58debd18dfce1352c8bb8019a94a136b85.png" src="../_images/fc8f08a01c2e5240f7e520e09fb9fe58debd18dfce1352c8bb8019a94a136b85.png" />
+</div>
+</div>
+<ol class="arabic simple">
+<li><p>努力将0类用户发展成重要高价值用户，通过低价会员升级、高价产品折扣等方式提高购买金额。</p></li>
+<li><p>2类用户大概率是新用户，最近需要促进1类用户的购买，提高他们的购买频次。</p></li>
+<li><p>对于1类用户，属于一般挽留用户，大概率流失了，需要去分析具体原因，加以改善。有空可以尝试对1类用户进行进一步的细分，拉回有需求有价值的用户。</p></li>
+</ol>
+<p><img alt="image" src="../_images/img1.png" /></p>
+<p>上图为以前的的分类结果运营指导，分类序号有所不同。</p>
+</section>
+</section>
+<section id="id16">
+<h3>4. 结论与思考<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<section id="id17">
+<h4>用户价值分类结论：<a class="headerlink" href="#id17" title="Link to this heading">#</a></h4>
+<p>在这个案例中，聚类可以将用户进行大致分群，进行精细化营销，聚类和分组价值打分方法的分群结论上比较相似：</p>
+<ul class="simple">
+<li><p>即在这个数据集中，存在少量的重要价值用户；</p></li>
+<li><p>一般挽留用户居多，很多用户在没有形成购物习惯的时候就已经开始有流失的倾向，需要具体分析原因，有效的挽留这些用户。</p></li>
+<li><p>一般价值用户占比也较多，通过低价会员升级、高价产品折扣等方式提高购买金额，将其发展成重要高价值用户。</p></li>
+<li><p>其次为一般发展用户，这些用户有可能刚刚开始使用，有可能是新用户，可以发放优惠券等方式促进复购，提高购买频次，发展用户忠诚度。</p></li>
+</ul>
+</section>
+<section id="id18">
+<h4>分群方法选择的思考：<a class="headerlink" href="#id18" title="Link to this heading">#</a></h4>
+<p>在方法的选择上，如果开始无法确定节点对数据进行分组打分，那么在一开始选择聚类的方式是比较合理的，可以随着对业务数据的了解，积累业务经验数据之后再进行分组打分，用平均值方式进行分群会更好。</p>
+</section>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./电商数据分析"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="second.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">用户行为分析</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">项目背景与目的</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">项目背景</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">项目目的</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">数据读取及预处理</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">描述性统计</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">用户价值分类</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">1. 用中位数进行用户价值分类</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">中位数分群的思考</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">2.用分组价值打分及平均值进行用户分群</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">平均值分组打分方法的思考</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">3. 用聚类方法进行用户分群</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">1) 标准化处理</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">2) 测试获取最优的聚类簇数</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">3) 确定模型</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">4) 聚类结论</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">4. 结论与思考</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">用户价值分类结论：</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">分群方法选择的思考：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Tevin
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
