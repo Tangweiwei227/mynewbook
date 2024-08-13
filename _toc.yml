@@ -8,6 +8,7 @@ parts:
     chapters:
       - file: 电商数据分析/first.ipynb
       - file: 电商数据分析/second.ipynb
+      - file: 电商数据分析/电商用户价值分层（RFM+聚类分析）.ipynb
 
 
 # format: jb-book

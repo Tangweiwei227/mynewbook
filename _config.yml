@@ -3,6 +3,7 @@
 
 title: 数据分析实践小册
 author: Tevin
+copyright : "2024" 
 logo: logo.png
 email: 312011010630@home.hpu.edu.cn
 
@@ -41,11 +42,11 @@ repository:
 # Add GitHub buttons to your book
 # See https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository
 html:
-  use_issues_button: true
-  use_repository_button: true
+  use_issues_button: false
+  use_repository_button: false
   # use_edit_page_button: true
   # comments:
-  #   hypothesis: true
+  # hypothesis: true
 
 
 # sphinx:
