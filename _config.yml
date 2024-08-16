@@ -45,8 +45,8 @@ html:
   use_issues_button: false
   use_repository_button: false
   # use_edit_page_button: true
-  # comments:
-  # hypothesis: true
+  comments:
+    hypothesis: true
   analytics:
     google_analytics_id: G-97XHC9FZ6T
 
